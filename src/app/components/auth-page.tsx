@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Plane } from "lucide-react";
 import { saveUser, getCurrentUser } from "../utils/storage";
 import { toast } from "sonner";
+import { login, signup } from "../services/auth";
 
 export function AuthPage() {
   const navigate = useNavigate();
@@ -25,43 +26,52 @@ export function AuthPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
+    try {
+      const formData = new FormData(e.currentTarget);
+      const email = formData.get("email") as string;
+      const password = formData.get("password") as string;
 
-    // Simulate login
-    setTimeout(() => {
-      const user = {
-        id: Date.now().toString(),
-        name: email.split("@")[0],
-        email: email,
-      };
-      saveUser(user);
+      const user = await login({ email, password });
+      
+      // Salvar usuário no localStorage
+      // saveUser(user);
+      
       toast.success("Login realizado com sucesso!");
       navigate("/dashboard");
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || "Erro ao fazer login. Tente novamente.";
+      toast.error(errorMessage);
+      console.error("Erro no login:", error);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
 
-    const formData = new FormData(e.currentTarget);
-    const name = formData.get("name") as string;
-    const email = formData.get("email") as string;
+    try {
+      const formData = new FormData(e.currentTarget);
+      const name = formData.get("name") as string;
+      const email = formData.get("email") as string;
+      const password = formData.get("password") as string;
+      const phone = formData.get("phone") as string;
 
-    // Simulate signup
-    setTimeout(() => {
-      const user = {
-        id: Date.now().toString(),
-        name: name,
-        email: email,
-      };
+      const user = await signup({ name, email, password, phone });
+      
+      // Salvar usuário no localStorage
       saveUser(user);
+      
       toast.success("Cadastro realizado com sucesso!");
       navigate("/dashboard");
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || "Erro ao fazer cadastro. Tente novamente.";
+      toast.error(errorMessage);
+      console.error("Erro no cadastro:", error);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -72,7 +82,7 @@ export function AuthPage() {
             <Plane className="size-8 text-white" />
           </div>
         </div>
-        
+
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-2xl">Alerta de Passagens</CardTitle>
@@ -86,7 +96,7 @@ export function AuthPage() {
                 <TabsTrigger value="login">Login</TabsTrigger>
                 <TabsTrigger value="signup">Cadastro</TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="login">
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
@@ -114,7 +124,7 @@ export function AuthPage() {
                   </Button>
                 </form>
               </TabsContent>
-              
+
               <TabsContent value="signup">
                 <form onSubmit={handleSignup} className="space-y-4">
                   <div className="space-y-2">
@@ -144,6 +154,16 @@ export function AuthPage() {
                       name="password"
                       type="password"
                       placeholder="••••••••"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-phone">Telefone</Label>
+                    <Input
+                      id="signup-phone"
+                      name="phone"
+                      type="tel"
+                      placeholder="(00) 00000-0000"
                       required
                     />
                   </div>

@@ -4,6 +4,8 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  phone?: string;
+  token?: string;
 }
 
 export interface Route {
@@ -36,6 +38,7 @@ export const getCurrentUser = (): User | null => {
 
 export const logout = () => {
   localStorage.removeItem("currentUser");
+  localStorage.removeItem("authToken");
 };
 
 // Routes management
