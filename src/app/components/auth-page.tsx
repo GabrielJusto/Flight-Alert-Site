@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -14,13 +14,13 @@ export function AuthPage() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
-  // Check if user is already logged in
-  useState(() => {
+  
+  useEffect(() => {
     const user = getCurrentUser();
     if (user) {
       navigate("/dashboard");
     }
-  });
+  }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,10 +31,9 @@ export function AuthPage() {
       const email = formData.get("email") as string;
       const password = formData.get("password") as string;
 
-      const user = await login({ email, password });
+      const user = await login({ username: email, password });
 
-      // Salvar usuário no localStorage
-      // saveUser(user);
+      saveUser(user);
 
       toast.success("Login realizado com sucesso!");
       navigate("/dashboard");
@@ -60,8 +59,6 @@ export function AuthPage() {
       const phoneNumber = formData.get("phone") as string;
 
       const user = await signup({ name, lastName, email, password, phoneNumber });
-
-      // Salvar usuário no localStorage
       saveUser(user);
 
       toast.success("Cadastro realizado com sucesso!");

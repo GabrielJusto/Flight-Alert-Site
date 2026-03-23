@@ -1,9 +1,8 @@
-import { api } from './api';
 import { User } from '../utils/storage';
+import { api } from './api';
 
-// Tipos para as requisições de autenticação
 export interface LoginData {
-    email: string;
+    username: string;
     password: string;
 }
 
@@ -20,17 +19,15 @@ export interface AuthResponse {
     token: string;
 }
 
-// Função de login
-export const login = async (data: LoginData): Promise<AuthResponse> => {
+export const login = async (data: LoginData): Promise<User> => {
     const response = await api.post<AuthResponse>('/auth/login', data);
-
-    // Salvar o token e userId no localStorage
-    if (response.data.token) {
-        localStorage.setItem('authToken', response.data.token);
-        localStorage.setItem('userId', response.data.userId.toString());
-    }
-
-    return response.data;
+    const user: User = {
+        id: response.data.userId.toString(),
+        name: '', 
+        email: data.username,
+        token: response.data.token,
+    };
+    return user;
 };
 
 
@@ -41,14 +38,13 @@ export const signup = async (data: SignupData): Promise<User> => {
         baseURL: import.meta.env.VITE_API_URL
     });
     const response = await api.post<AuthResponse>('/auth/register', data);
-
+    
     const user: User = {
         id: response.data.userId.toString(),
         name: data.name,
         lastName: data.lastName,
         email: data.email,
-        phone: data.phoneNumber,
-        token: response.data.token
+        token: response.data.token,
     };
 
     return user;
