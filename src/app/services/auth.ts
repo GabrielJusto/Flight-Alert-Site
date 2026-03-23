@@ -9,9 +9,10 @@ export interface LoginData {
 
 export interface SignupData {
     name: string;
+    lastName: string;
     email: string;
     password: string;
-    phone: string;
+    phoneNumber: string;
 }
 
 export interface AuthResponse {
@@ -43,9 +44,10 @@ export const signup = async (data: SignupData): Promise<User> => {
 
     const user: User = {
         id: response.data.userId.toString(),
-        name: '',
+        name: data.name,
+        lastName: data.lastName,
         email: data.email,
-        phone: '',
+        phone: data.phoneNumber,
         token: response.data.token
     };
 

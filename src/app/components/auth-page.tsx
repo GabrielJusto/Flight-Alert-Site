@@ -32,10 +32,10 @@ export function AuthPage() {
       const password = formData.get("password") as string;
 
       const user = await login({ email, password });
-      
+
       // Salvar usuário no localStorage
       // saveUser(user);
-      
+
       toast.success("Login realizado com sucesso!");
       navigate("/dashboard");
     } catch (error: any) {
@@ -54,15 +54,16 @@ export function AuthPage() {
     try {
       const formData = new FormData(e.currentTarget);
       const name = formData.get("name") as string;
+      const lastName = formData.get("lastName") as string;
       const email = formData.get("email") as string;
       const password = formData.get("password") as string;
-      const phone = formData.get("phone") as string;
+      const phoneNumber = formData.get("phone") as string;
 
-      const user = await signup({ name, email, password, phone });
-      
+      const user = await signup({ name, lastName, email, password, phoneNumber });
+
       // Salvar usuário no localStorage
       saveUser(user);
-      
+
       toast.success("Cadastro realizado com sucesso!");
       navigate("/dashboard");
     } catch (error: any) {
@@ -134,6 +135,16 @@ export function AuthPage() {
                       name="name"
                       type="text"
                       placeholder="Seu nome"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-lastName">Sobrenome</Label>
+                    <Input
+                      id="signup-lastName"
+                      name="lastName"
+                      type="text"
+                      placeholder="Seu sobrenome"
                       required
                     />
                   </div>
