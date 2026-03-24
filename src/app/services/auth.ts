@@ -32,11 +32,6 @@ export const login = async (data: LoginData): Promise<User> => {
 
 
 export const signup = async (data: SignupData): Promise<User> => {
-    console.log('Chamando signup:', {
-        url: '/auth/register',
-        data,
-        baseURL: import.meta.env.VITE_API_URL
-    });
     const response = await api.post<AuthResponse>('/auth/register', data);
     
     const user: User = {

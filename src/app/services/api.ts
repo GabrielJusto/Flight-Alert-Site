@@ -11,18 +11,17 @@ export const api = axios.create({
 });
 
 // Interceptor para adicionar o token de autenticação em todas as requisições
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+api.interceptors.request.use((config) => {
+    const user = localStorage.getItem('currentUser');
+    if (user) {
+        const token = JSON.parse(user).token;
+        config.headers = config.headers || {};
+        config.headers['Authorization'] = `Bearer ${token}`;
     }
+
+    console.log('Authorization header enviado:', config.headers['Authorization']);
     return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+});
 
 // Interceptor para tratar erros de resposta
 api.interceptors.response.use(
