@@ -42,12 +42,6 @@ export const logout = () => {
   localStorage.removeItem("authToken");
 };
 
-// Routes management
-export const saveRoute = (route: Route) => {
-  const routes = getRoutes();
-  routes.push(route);
-  localStorage.setItem("routes", JSON.stringify(routes));
-};
 
 export const getRoutes = (): Route[] => {
   const routes = localStorage.getItem("routes");
@@ -76,13 +70,6 @@ export const deleteRoute = (routeId: string) => {
   const routes = getRoutes();
   const filtered = routes.filter((route) => route.id !== routeId);
   localStorage.setItem("routes", JSON.stringify(filtered));
-};
-
-// Price history management
-export const savePriceHistory = (history: PriceHistory) => {
-  const allHistory = getPriceHistory();
-  allHistory.push(history);
-  localStorage.setItem("priceHistory", JSON.stringify(allHistory));
 };
 
 export const getPriceHistory = (): PriceHistory[] => {

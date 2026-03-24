@@ -3,8 +3,9 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { getCurrentUser, saveRoute, savePriceHistory } from "../utils/storage";
+import { getCurrentUser } from "../utils/storage";
 import { toast } from "sonner";
+import { addRoute, Route } from "../services/routes";
 
 interface AddRouteDialogProps {
   open: boolean;
@@ -23,57 +24,30 @@ export function AddRouteDialog({ open, onOpenChange, onRouteAdded }: AddRouteDia
     const origin = formData.get("origin") as string;
     const destination = formData.get("destination") as string;
     const targetPrice = parseFloat(formData.get("targetPrice") as string);
+    const departureDay = formData.get("departureDay") as string;
+    const returnDay = formData.get("returnDay") as string;
 
     const user = getCurrentUser();
     if (!user) return;
 
-    // Simulate fetching current price
-    const currentPrice = targetPrice + Math.random() * 500 - 250;
-
-    const newRoute = {
-      id: Date.now().toString(),
+    const newRoute: Route = {
       userId: user.id,
-      origin: origin.toUpperCase(),
-      destination: destination.toUpperCase(),
-      targetPrice,
-      currentPrice: Math.max(0, currentPrice),
-      createdAt: new Date().toISOString(),
-      active: true,
+      originIataCode: origin.toUpperCase(),
+      destinationIataCode: destination.toUpperCase(),
+      targetPrice: targetPrice,
+      departureDay: departureDay,
+      returnDay: returnDay || null
     };
 
-    // Save route
-    saveRoute(newRoute);
-
-    // Create initial price history
-    const initialHistory = {
-      id: Date.now().toString(),
-      routeId: newRoute.id,
-      price: newRoute.currentPrice,
-      date: new Date().toISOString(),
-    };
-    savePriceHistory(initialHistory);
-
-    // Create some mock historical data (last 30 days)
-    for (let i = 1; i <= 30; i++) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      
-      const historicalPrice = newRoute.currentPrice + (Math.random() * 400 - 200);
-      
-      savePriceHistory({
-        id: `${Date.now()}-${i}`,
-        routeId: newRoute.id,
-        price: Math.max(0, historicalPrice),
-        date: date.toISOString(),
-      });
-    }
-
-    setTimeout(() => {
+    const success = await addRoute(newRoute);
+    if (success) {
       toast.success("Rota adicionada com sucesso!");
       onRouteAdded();
-      setIsLoading(false);
       onOpenChange(false);
-    }, 1000);
+    } else {
+      toast.error("Erro ao adicionar a rota. Tente novamente.");
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -85,7 +59,7 @@ export function AddRouteDialog({ open, onOpenChange, onRouteAdded }: AddRouteDia
             Configure uma nova rota para monitorar os preços de passagens
           </DialogDescription>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="origin">Origem (código IATA)</Label>
@@ -99,7 +73,7 @@ export function AddRouteDialog({ open, onOpenChange, onRouteAdded }: AddRouteDia
               title="Digite o código IATA de 3 letras"
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="destination">Destino (código IATA)</Label>
             <Input
@@ -112,7 +86,23 @@ export function AddRouteDialog({ open, onOpenChange, onRouteAdded }: AddRouteDia
               title="Digite o código IATA de 3 letras"
             />
           </div>
-          
+          <div className="space-y-2">
+            <Label htmlFor="departureDay">Data de Ida</Label>
+            <Input
+              id="departureDay"
+              name="departureDay"
+              type="date"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="returnDay">Data de Volta (opcional)</Label>
+            <Input
+              id="returnDay"
+              name="returnDay"
+              type="date"
+            />
+          </div>
           <div className="space-y-2">
             <Label htmlFor="targetPrice">Preço Alvo (R$)</Label>
             <Input
@@ -128,7 +118,7 @@ export function AddRouteDialog({ open, onOpenChange, onRouteAdded }: AddRouteDia
               Você será notificado quando o preço estiver abaixo deste valor
             </p>
           </div>
-          
+
           <div className="flex gap-3 pt-4">
             <Button
               type="button"
