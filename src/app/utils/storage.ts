@@ -62,12 +62,6 @@ export const updateRoute = (routeId: string, updates: Partial<Route>) => {
   }
 };
 
-export const deleteRoute = (routeId: string) => {
-  const routes = getRoutes();
-  const filtered = routes.filter((route) => route.id !== routeId);
-  localStorage.setItem("routes", JSON.stringify(filtered));
-};
-
 export const getPriceHistory = (): PriceHistory[] => {
   const history = localStorage.getItem("priceHistory");
   return history ? JSON.parse(history) : [];

@@ -4,10 +4,10 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Plane, Plus, LogOut, TrendingDown, TrendingUp, ArrowRight, Trash2 } from "lucide-react";
-import { getCurrentUser, logout, deleteRoute } from "../utils/storage";
+import { getCurrentUser, logout } from "../utils/storage";
 import { AddRouteDialog } from "./add-route-dialog";
 import { toast } from "sonner";
-import { getUserRoutes, RouteDetail } from "../services/routes";
+import { deleteRoute, getUserRoutes, RouteDetail } from "../services/routes";
 
 export function Dashboard() {
   const navigate = useNavigate();
@@ -36,10 +36,14 @@ export function Dashboard() {
     navigate("/");
   };
 
-  const handleDeleteRoute = (routeId: string) => {
-    deleteRoute(routeId);
-    loadRoutes();
-    toast.success("Rota removida com sucesso!");
+  const handleDeleteRoute = async (routeId: string) => {
+    const success = await deleteRoute(routeId);
+    if (success) {
+      loadRoutes();
+      toast.success("Rota removida com sucesso!");
+    } else {
+      toast.error("Erro ao remover a rota.");
+    }
   };
 
   const handleRouteAdded = () => {

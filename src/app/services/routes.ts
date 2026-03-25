@@ -49,4 +49,9 @@ export async function getUserRoutes(userId: string): Promise<RouteDetail[]> {
     return [];
 }
 
+export async function deleteRoute(routeId: string): Promise<boolean> {
+    const response = await api.delete(`/routes/delete/${routeId}`);
+    return response.status < 300;
+}
+
 
