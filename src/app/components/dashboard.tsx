@@ -4,14 +4,15 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Plane, Plus, LogOut, TrendingDown, TrendingUp, ArrowRight, Trash2 } from "lucide-react";
-import { getCurrentUser, getUserRoutes, logout, Route, deleteRoute } from "../utils/storage";
+import { getCurrentUser, logout, deleteRoute } from "../utils/storage";
 import { AddRouteDialog } from "./add-route-dialog";
 import { toast } from "sonner";
+import { getUserRoutes, RouteDetail } from "../services/routes";
 
 export function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(getCurrentUser());
-  const [routes, setRoutes] = useState<Route[]>([]);
+  const [routes, setRoutes] = useState<RouteDetail[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -22,9 +23,9 @@ export function Dashboard() {
     loadRoutes();
   }, [user, navigate]);
 
-  const loadRoutes = () => {
+  const loadRoutes = async () => {
     if (user) {
-      const userRoutes = getUserRoutes(user.id);
+      const userRoutes = await getUserRoutes(user.id);
       setRoutes(userRoutes);
     }
   };
@@ -88,7 +89,7 @@ export function Dashboard() {
             <CardHeader className="pb-3">
               <CardDescription>Alertas Ativos</CardDescription>
               <CardTitle className="text-3xl">
-                {routes.filter((r) => r.active).length}
+                {routes.length}
               </CardTitle>
             </CardHeader>
           </Card>
@@ -140,13 +141,10 @@ export function Dashboard() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="font-semibold text-lg">{route.origin}</span>
+                          <span className="font-semibold text-lg">{route.originIataCode}</span>
                           <ArrowRight className="size-4 text-gray-400" />
-                          <span className="font-semibold text-lg">{route.destination}</span>
+                          <span className="font-semibold text-lg">{route.destinationIataCode}</span>
                         </div>
-                        <CardDescription>
-                          Adicionada em {new Date(route.createdAt).toLocaleDateString('pt-BR')}
-                        </CardDescription>
                       </div>
                       <Button
                         variant="ghost"
@@ -200,9 +198,9 @@ export function Dashboard() {
                         )}
                       </div>
                       
-                      <Badge variant={route.active ? "default" : "outline"} className="w-full justify-center">
+                      {/* <Badge variant={route.active ? "default" : "outline"} className="w-full justify-center">
                         {route.active ? "Alerta Ativo" : "Alerta Pausado"}
-                      </Badge>
+                      </Badge> */}
                     </div>
                   </CardContent>
                 </Card>

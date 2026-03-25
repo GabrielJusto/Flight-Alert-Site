@@ -16,7 +16,6 @@ export interface Route {
   destination: string;
   targetPrice: number;
   currentPrice: number;
-  createdAt: string;
   active: boolean;
 }
 
@@ -48,9 +47,6 @@ export const getRoutes = (): Route[] => {
   return routes ? JSON.parse(routes) : [];
 };
 
-export const getUserRoutes = (userId: string): Route[] => {
-  return getRoutes().filter((route) => route.userId === userId);
-};
 
 export const getRouteById = (routeId: string): Route | null => {
   const routes = getRoutes();
