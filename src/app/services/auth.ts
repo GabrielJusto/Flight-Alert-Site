@@ -16,6 +16,9 @@ export interface SignupData {
 
 export interface AuthResponse {
     userId: number;
+    name: string;
+    lastName?: string | null;
+    email: string;
     token: string;
 }
 
@@ -23,8 +26,8 @@ export const login = async (data: LoginData): Promise<User> => {
     const response = await api.post<AuthResponse>('/auth/login', data);
     const user: User = {
         id: response.data.userId.toString(),
-        name: '', 
-        email: data.username,
+        name: response.data.name, 
+        email: response.data.email,
         token: response.data.token,
     };
     return user;
