@@ -40,7 +40,7 @@ export async function getUserRoutes(userId: string): Promise<RouteDetail[]> {
             userId: route.userId,
             originIataCode: route.originIataCode,
             destinationIataCode: route.destinationIataCode,
-            targetPrice: 0,
+            targetPrice: route.targetPrice,
             currentPrice: route.currentPrice,
             departureDay: route.departureDay,
             returnDay: null,

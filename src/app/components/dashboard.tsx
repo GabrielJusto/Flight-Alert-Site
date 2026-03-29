@@ -98,14 +98,14 @@ export function Dashboard() {
             </CardHeader>
           </Card>
           
-          <Card>
+          {/* <Card>
             <CardHeader className="pb-3">
               <CardDescription>Economia Potencial</CardDescription>
               <CardTitle className="text-3xl text-green-600">
                 R$ {routes.reduce((acc, r) => acc + Math.max(0, r.currentPrice - r.targetPrice), 0).toFixed(0)}
               </CardTitle>
             </CardHeader>
-          </Card>
+          </Card> */}
         </div>
 
         {/* Routes List */}
