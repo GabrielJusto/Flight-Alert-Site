@@ -7,7 +7,7 @@ import { Plane, Plus, LogOut, TrendingDown, TrendingUp, ArrowRight, Trash2 } fro
 import { getCurrentUser, logout } from "../utils/storage";
 import { AddRouteDialog } from "./add-route-dialog";
 import { toast } from "sonner";
-import { deleteRoute, getUserRoutes, RouteDetail } from "../services/routes";
+import { deleteRoute, getUserRoutes, RouteDetail, updateRoute } from "../services/routes";
 
 export function Dashboard() {
   const navigate = useNavigate();
@@ -43,6 +43,16 @@ export function Dashboard() {
       toast.success("Rota removida com sucesso!");
     } else {
       toast.error("Erro ao remover a rota.");
+    }
+  };
+
+  const handleToggleAlert = async (routeId: string, active: boolean) => {
+    const success = await updateRoute(routeId, { isActive: active });
+    if (success) {
+      loadRoutes();
+      toast.success("Alerta atualizado com sucesso!");
+    } else {
+      toast.error("Erro ao atualizar o alerta.");
     }
   };
 
@@ -88,7 +98,7 @@ export function Dashboard() {
               <CardTitle className="text-3xl">{routes.length}</CardTitle>
             </CardHeader>
           </Card>
-          
+
           <Card>
             <CardHeader className="pb-3">
               <CardDescription>Alertas Ativos</CardDescription>
@@ -97,7 +107,7 @@ export function Dashboard() {
               </CardTitle>
             </CardHeader>
           </Card>
-          
+
           {/* <Card>
             <CardHeader className="pb-3">
               <CardDescription>Economia Potencial</CardDescription>
@@ -134,7 +144,7 @@ export function Dashboard() {
             {routes.map((route) => {
               const priceDiff = route.currentPrice - route.targetPrice;
               const isAboveTarget = priceDiff > 0;
-              
+
               return (
                 <Card
                   key={route.id}
@@ -170,14 +180,14 @@ export function Dashboard() {
                           R$ {route.currentPrice.toFixed(2)}
                         </span>
                       </div>
-                      
+
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">Preço Alvo</span>
                         <span className="text-lg">
                           R$ {route.targetPrice.toFixed(2)}
                         </span>
                       </div>
-                      
+
                       <div className="flex items-center justify-between pt-2 border-t">
                         {isAboveTarget ? (
                           <>
@@ -201,10 +211,37 @@ export function Dashboard() {
                           </>
                         )}
                       </div>
-                      
-                      {/* <Badge variant={route.active ? "default" : "outline"} className="w-full justify-center">
+
+                      <Badge variant={route.active ? "default" : "outline"} className="w-full justify-center">
                         {route.active ? "Alerta Ativo" : "Alerta Pausado"}
-                      </Badge> */}
+                      </Badge>
+                      <Button
+                        className="w-full justify-center mt-2"
+                        variant="outline"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleAlert(route.userMonitoredRouteId, !route.active);
+                        }}
+                      >
+                        {route.active ? "Desativar Alerta" : "Ativar Alerta"}
+                        <ArrowRight className="size-4" />
+                      </Button>
+                      <Button
+                        asChild
+                        className="w-full justify-center mt-2"
+                        variant="outline"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <a
+                          href={route.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-2"
+                        >
+                          Comprar Passagem
+                          <ArrowRight className="size-4" />
+                        </a>
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
